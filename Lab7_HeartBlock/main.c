@@ -16,10 +16,10 @@
 
 // inclues
 #include "TExaS.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include "../tm4c123gh6pm.h"
-#include "../driverlib/sysctl.h"
+//#include <stdint.h>
+//#include <stdbool.h>
+//#include "../tm4c123gh6pm.h"
+//#include "../driverlib/sysctl.h"
 
 // AS = PF4
 #define AS (*((volatile unsigned long *) 0x40025040)) 
@@ -57,6 +57,7 @@ int main(void){
   PortF_Init();                            // Init port PF4 PF3 PF1    
   EnableInterrupts();                      // enable interrupts for the grader  
   while(1){
+		VT = 0x00;
 		// Make Ready signal go high
 		SetReady();
 		// Wait for AS to be 0, switch to be pressed
@@ -112,7 +113,7 @@ void PortF_Init(void){ volatile unsigned long delay;
  */
 void WaitForASLow(void){
 //Read AS
-	while(!AS){
+	while(AS){
 		
 	}
 	// If AS is low -> return right away
@@ -126,7 +127,7 @@ void WaitForASLow(void){
  * Outputs: None
  */
 void WaitForASHigh(void){
-	while(AS){
+	while(!AS){
 		
 	}
 }
@@ -167,8 +168,17 @@ void ClearReady(void){
  * Inputs:  Number of milliseconds to delay
  * Outputs: None
  */
-void Delay1ms(unsigned long msec){
-	SysCtlDelay(msec * (SysCtlClockGet() / 3 /1000));
+void Delay1ms(unsigned long time){
+	
+	//SysCtlDelay(msec * (SysCtlClockGet() / 3 /1000));
+	unsigned long i;
+	while(time>0){
+		i=13333; //this num means 1000ms
+		while(i>0){
+			i=i-1;
+		}
+		time = time-1; //decrements every 100ms
+	}
 
 }
 
