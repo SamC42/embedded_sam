@@ -54,25 +54,37 @@ void PortF_init(void){
 #define PA1 (*((volatile unsigned long *) 0x40004008 ))
 #define PA0 (*((volatile unsigned long *) 0x40004004 ))
 
-/* Clearing a Bit
+/* Clearing a Bit &= ~0xYY
  * Clearning a bit makes the bit  low or 0
  * Using the Define statement above we can clear PA5
  * This code will only change the value at PA5
  */
  PA5 = 0x00;
+ PE4 & = ~0x10;
  
 /* Setting a Bit
  * Setting a bit makes the bit high or 1
  * Using the Define statement above we can set PA5
  * This code will only change the value at PA5
- * Setting: NOTE! We use 1 in the bit 5 space, do not get confused between the data register notation and normal space for bit 5.
+ * NOTE: We use 1 in the bit 5 space, do not get confused between the data register address and normal space for bit 5. We are only changing the VALUE OF PA5
  * PA5  | 0x00000020 | ... 0000 0000 0010 0000
  */
 	PA5 = 0x20;
+	//Set PE4 to 1
+	PE4 = 0x10; // .... 0001 0000 Setting the addresw pf PE4 Data to 1
 	
-/* Toggling a bit
+	
+/* Toggling a bit (^)
  * Example: Toggle bit 5
  * If PA5 is an output then the Or functionality will toggle it on or off
  */
- PA5 = PA5^0x02;
+ PA5 = PA5^0x20;
+ 
+ /* Initializing
+  *
+  */
+	//Output 
+	GPIO_PORTE_DIR_R |= 0x02;        // 5. PE1 output .... 0000 0010
+	//Input since &= ~0xYY zeros out the bit you show
+	GPIO_PORTE_DIR_R &= ~0x01;        // 5. PE0 input  .... 0000 0001
 	
