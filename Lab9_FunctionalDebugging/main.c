@@ -3,16 +3,17 @@
 // Runs on LM4F120/TM4C123
 // In this lab we are learning functional debugging by dumping
 //   recorded I/O data into a buffer
-// January 15, 2016
 
 // Lab 9
-//      Jon Valvano and Ramesh Yerraballi
 
 // ***** 1. Pre-processor Directives Section *****
 #include "TExaS.h"
-#include "tm4c123gh6pm.h"
+#include "../tm4c123gh6pm.h"
 
 // ***** 2. Global Declarations Section *****
+#define SW1 (*((volatile unsigned long *) 0x40025040)) // PF4
+#define Led (*((volatile unsigned long *) 0x40025008)) // PF1
+#define SW2 (*((volatile unsigned long *) 0x40025004)) // PF0
 
 // FUNCTION PROTOTYPES: Each subroutine defined
 void DisableInterrupts(void); // Disable interrupts
@@ -63,9 +64,9 @@ void SysTick_Init(void){
   NVIC_ST_CURRENT_R = 0;                // any write to current clears it             
   NVIC_ST_CTRL_R = 0x00000005;          // enable SysTick with core clock
 }
-unsigned long Led;
+unsigned long LedS;
 void Delay(void){unsigned long volatile time;
-  time = 160000; // 0.1sec
+  time = 80000; // 0.1sec
   while(time){
    time--;
   }
@@ -74,35 +75,33 @@ void Delay(void){unsigned long volatile time;
 unsigned long Time[50];
 // you must leave the Data array defined exactly as it is
 unsigned long Data[50];
-int main(void){  unsigned long i,last,now;
+int main(void){  unsigned long i,last,now, lastS, nowS;
   TExaS_Init(SW_PIN_PF40, LED_PIN_PF1);  // activate grader and set system clock to 16 MHz
   PortF_Init();   // initialize PF1 to output
   SysTick_Init(); // initialize SysTick, runs at 16 MHz
   i = 0;          // array index
   last = NVIC_ST_CURRENT_R;
+	lastS = GPIO_PORTF_DATA_R&0x13;
   EnableInterrupts();           // enable interrupts for the grader
   while(1){
-    Led = GPIO_PORTF_DATA_R;   // read previous
-    Led = Led^0x02;            // toggle red LED
-    GPIO_PORTF_DATA_R = Led;   // output 
-    if(i<50){
+		// If SW1 or SW2 then toogle
+		if(!SW1 | !SW2 ){
+			Led = Led^0x02;            // toggle red LED
+		}
+		else if( SW1 && SW2){
+			Led = 0x00;
+		}
+		
+		nowS = GPIO_PORTF_DATA_R&0x13;
+    if(i<50 && nowS != lastS){
       now = NVIC_ST_CURRENT_R;
       Time[i] = (last-now)&0x00FFFFFF;  // 24-bit time difference
-      Data[i] = GPIO_PORTF_DATA_R&0x02; // record PF1
+			Data[i] = GPIO_PORTF_DATA_R&0x13; // record PF4,1,0
       last = now;
+			lastS = nowS;
       i++;
     }
     Delay();
   }
 }
 
-
-// Color    LED(s) PortF
-// dark     ---    0
-// red      R--    0x02
-// blue     --B    0x04
-// green    -G-    0x08
-// yellow   RG-    0x0A
-// sky blue -GB    0x0C
-// white    RGB    0x0E
-// pink     R-B    0x06
