@@ -15,6 +15,7 @@ void EnableInterrupts(void);  // Enable interrupts
 // do not edit this main
 // your job is to implement the UART_OutUDec UART_OutDistance functions 
 int main(void){ unsigned long n;
+
   TExaS_Init();             // initialize grader, set system clock to 80 MHz
   UART_Init();              // initialize UART
   EnableInterrupts();       // needed for TExaS

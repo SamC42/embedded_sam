@@ -122,10 +122,13 @@ char character;
 // Input: pointer to a NULL-terminated string to be transferred
 // Output: none
 void UART_OutString(unsigned char buffer[]){
-// as part of Lab 11 implement this function
-
+	int i=0;
+	while(buffer[i] != '\0'){
+		UART_OutChar(buffer[i]);
+		++i;
+	}
+	//UART_OutChar('0');
 }
-
 unsigned char String[10];
 //-----------------------UART_ConvertUDec-----------------------
 // Converts a 32-bit number in unsigned decimal format
@@ -139,8 +142,21 @@ unsigned char String[10];
 // 2210 to "2210 "
 //10000 to "**** "  any value larger than 9999 converted to "**** "
 void UART_ConvertUDec(unsigned long n){
-// as part of Lab 11 implement this function
-  
+		int i,flag;
+	flag =0;
+	for(i=0;i<=3;i++){
+		
+		if(n > 9999 || flag ==1){
+			String[i] = 0x2A;
+			flag = 1;
+		}
+		else{
+			String[i] = (n+0x30);
+		}
+	}
+		String[4] = ' ';
+		String[5] = '0';
+		
 }
 
 //-----------------------UART_OutUDec-----------------------
