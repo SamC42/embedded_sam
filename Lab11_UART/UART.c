@@ -142,7 +142,8 @@ unsigned char String[10];
 // 2210 to "2210 "
 //10000 to "**** "  any value larger than 9999 converted to "**** "
 void UART_ConvertUDec(unsigned long n){
-		int i,flag;
+	int i,flag;
+	unsigned long	factor = 1000;
 	flag =0;
 	for(i=0;i<=3;i++){
 		
@@ -151,11 +152,20 @@ void UART_ConvertUDec(unsigned long n){
 			flag = 1;
 		}
 		else{
+			if( (n%factor) == 0 ){
+				String[i] = ' ';
+			}
+			else{
+			//n = n /factor;
 			String[i] = (n+0x30);
+				n = n/factor;
+			}
+			factor /= 10;
+
 		}
 	}
 		String[4] = ' ';
-		String[5] = '0';
+		String[5] = '\0';
 		
 }
 
