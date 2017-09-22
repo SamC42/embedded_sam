@@ -28,6 +28,7 @@
 
 #include "../tm4c123gh6pm.h"
 #include "UART.h"
+#include <stdlib.h>
 
 //------------UART_Init------------
 // Initialize the UART for 115200 baud rate (assuming 80 MHz UART clock),
@@ -142,28 +143,36 @@ unsigned char String[10];
 // 2210 to "2210 "
 //10000 to "**** "  any value larger than 9999 converted to "**** "
 void UART_ConvertUDec(unsigned long n){
-	int i,flag;
-	unsigned long	factor = 1000;
-	flag =0;
-	for(i=0;i<=3;i++){
-		
-		if(n > 9999 || flag ==1){
-			String[i] = 0x2A;
-			flag = 1;
+		if(n > 9999){
+			String[0] = 0x2A;
+			String[1] = 0x2A;
+			String[2] = 0x2A;
+			String[3] = 0x2A;
+		}
+		else if(n > 999){
+			String[0] = (n/1000)+0x30;
+			String[1] = ((n%1000) / 100 )+0x30;
+			String[2] = (((n%1000) % 100) / 10)+0x30;
+			String[3] = (((n%1000) % 100) % 10)+0x30;
+		}
+		else if(n > 99){
+			String[0] = ' ';
+			String[1] = (n / 100)+0x30;
+			String[2] = ((n%100) / 10)+0x30;
+			String[3] = (((n%100) % 100) % 10) + 0x30;
+		}
+		else if(n > 9){
+			String[0] = ' ';
+			String[1] = ' ';
+			String[2] = (n/10)+0x30;
+			String[3] = ((n%10))+0x30;
 		}
 		else{
-			if( (n%factor) == 0 ){
-				String[i] = ' ';
-			}
-			else{
-			//n = n /factor;
-			String[i] = (n+0x30);
-				n = n/factor;
-			}
-			factor /= 10;
-
+			String[0] = ' ';
+			String[1] = ' ';
+			String[2] = ' ';
+			String[3] = n+0x30;
 		}
-	}
 		String[4] = ' ';
 		String[5] = '\0';
 		
@@ -192,7 +201,54 @@ void UART_OutUDec(unsigned long n){
 //10000 to "*.*** cm"  any value larger than 9999 converted to "*.*** cm"
 void UART_ConvertDistance(unsigned long n){
 // as part of Lab 11 implement this function
-  
+  if(n > 9999){
+			String[0] = 0x2A;
+			String[1] = '.';
+			String[2] = 0x2A;
+			String[3] = 0x2A;
+			String[4] = 0x2A;
+		}
+		else if(n > 999){
+			String[0] = (n/1000)+0x30;
+			String[1] = '.';
+			String[2] = ((n%1000) / 100 )+0x30;
+			String[3] = (((n%1000) % 100) / 10)+0x30;
+			String[4] = (((n%1000) % 100) % 10)+0x30;
+		}
+		else if(n > 99){
+			String[0] = '0';
+			String[1] = '.';
+			String[2] = (n / 100)+0x30;
+			String[3] = ((n%100) / 10)+0x30;
+			String[4] = (((n%100) % 100) % 10) + 0x30;
+		}
+		else if(n > 9){
+			String[0] = '0';
+			String[1] = '.';
+			String[2] = '0';
+			String[3] = (n/10)+0x30;
+			String[4] = ((n%10))+0x30;
+		}
+		else if(n == 0){
+			String[0] = '0';
+			String[1] = '.';
+			String[2] = '0';
+			String[3] = '0';
+			String[4] = '0';
+		
+		}
+		else{
+			String[0] = '0';
+			String[1] = '.';
+			String[2] = '0';
+			String[3] = '0';
+			String[4] = n+0x30;
+		}
+		String[5] = ' ';
+		String[6] = 'c';
+		String[7] = 'm';
+		String[8] = '\0';
+		
 }
 
 //-----------------------UART_OutDistance-----------------------
